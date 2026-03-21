@@ -1,0 +1,41 @@
+trigger:
+- main
+
+variables:
+  imageName: 'devopsapp'
+
+stages:
+
+- stage: Build
+  jobs:
+  - job: BuildJob
+    pool:
+      vmImage: 'ubuntu-latest'
+
+    steps:
+    - checkout: self
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'azure-conn'
+        repository: 'devopsapp'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        tags: |
+          latest
+
+- stage: Deploy
+  dependsOn: Build
+  jobs:
+  - deployment: DeployWeb
+    environment: 'production'
+
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureWebAppContainer@1
+            inputs:
+              azureSubscription: 'azure-conn'
+              appName: 'devops-app-123'
+              containers: 'devopsacr123.azurecr.io/devopsapp:latest'
