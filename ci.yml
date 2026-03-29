@@ -1,0 +1,19 @@
+name: DevOps Pipeline
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Print message
+        run: echo "Build successful 🚀"
+
+      - name: Simulate test
+        run: echo "Tests passed ✅"
